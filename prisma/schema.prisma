@@ -1,22 +1,110 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum QuestionType {
+  SINGLE_CHOICE
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  ESSAY
+}
+
+model Question {
+  id              String         @id @default(uuid())
+  type            QuestionType
+  text            String
+  explanation     String?
+  options         AnswerOption[]
+  correctAnswers  CorrectAnswer[]
+  tests           TestQuestion[]
+  userAnswers     UserAnswer[]
+  scoreDetails    ScoreDetail[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model AnswerOption {
+  id          String   @id @default(uuid())
+  question    Question @relation(fields: [questionId], references: [id])
+  questionId  String
+  content     String
+  isCorrect   Boolean
+  order       Int
+}
+
+model CorrectAnswer {
+  id          String   @id @default(uuid())
+  question    Question @relation(fields: [questionId], references: [id])
+  questionId  String
+  answer      String   // Could be option ID for MCQs, "true"/"false" for T/F, or text for essay
+}
+
+model Test {
+  id            String         @id @default(uuid())
+  title         String
+  description   String?
+  duration      Int?           // Duration in minutes
+  testQuestions TestQuestion[]
+  scores        Score[]
+  userAnswers   UserAnswer[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model TestQuestion {
+  id          String   @id @default(uuid())
+  test        Test     @relation(fields: [testId], references: [id])
+  testId      String
+  question    Question @relation(fields: [questionId], references: [id])
+  questionId  String
+  maxScore    Float
+  weight      Float    @default(1.0)
+  order       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([testId, questionId])
+}
+
+model UserAnswer {
+  id          String   @id @default(uuid())
+  userId      String   // Reference to User service
+  test        Test     @relation(fields: [testId], references: [id])
+  testId      String
+  question    Question @relation(fields: [questionId], references: [id])
+  questionId  String
+  answerData  Json     // Flexible storage for different answer types
+  isGraded    Boolean  @default(false)
+  score       Float?
+  submittedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, testId, questionId])
+}
+
+model Score {
+  id          String        @id @default(uuid())
+  userId      String
+  test        Test          @relation(fields: [testId], references: [id])
+  testId      String
+  totalScore  Float
+  details     ScoreDetail[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model ScoreDetail {
+  id          String   @id @default(uuid())
+  score       Score    @relation(fields: [scoreId], references: [id])
+  scoreId     String
+  question    Question @relation(fields: [questionId], references: [id])
+  questionId  String
+  earnedScore Float
+  feedback    String?
+  createdAt   DateTime @default(now())
 }
