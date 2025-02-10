@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # Định nghĩa service cho ứng dụng NestJS
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000" # Ánh xạ cổng 3000 của container ra cổng 3000 của máy host
+    environment:
+      - DATABASE_HOST=db # Tên của service PostgreSQL
+      - DATABASE_PORT=5432
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=root
+      - DATABASE_NAME=edu-force-assessment
+    depends_on:
+      - db # Đảm bảo PostgreSQL khởi động trước ứng dụng
+
+  # Định nghĩa service cho PostgreSQL
+  db:
+    image: postgres:17 # Sử dụng image PostgreSQL phiên bản 15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: edu-force-assessment
+    ports:
+      - "5432:5432" # Ánh xạ cổng 5432 của container ra cổng 5432 của máy host
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Lưu trữ dữ liệu PostgreSQL
+
+# Định nghĩa volume để lưu trữ dữ liệu PostgreSQL
+volumes:
+  postgres_data:
