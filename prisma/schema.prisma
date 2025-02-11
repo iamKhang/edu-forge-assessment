@@ -22,17 +22,24 @@ enum TestType {
   ASSIGNMENT
 }
 
+enum ScoringPolicy {
+  HIGHEST
+  AVERAGE
+  LATEST
+}
+
 model Question {
   id              String         @id @default(uuid())
+  userId          String
   type            QuestionType
-  text            String
+  content            Json
   explanation     String?
   courseId        String?
   chapterId       String?
   lessonId        String?
   options         AnswerOption[]
-  correctAnswers  CorrectAnswer[]
   testQuestions   TestQuestion[]
+  referenceAnswers ReferenceAnswer?
   userAnswers     UserAnswer[]
   scoreDetails    ScoreDetail[]
   createdAt       DateTime       @default(now())
@@ -41,6 +48,16 @@ model Question {
   @@index([courseId])
   @@index([chapterId])
   @@index([lessonId])
+}
+
+model ReferenceAnswer {
+  id          String   @id @default(uuid())
+  question    Question @relation(fields: [questionId], references: [id])
+  questionId  String   @unique
+  content     Json  
+  notes       String? 
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Test {
@@ -56,9 +73,11 @@ model Test {
   shuffleQuestions Boolean     @default(false)
   maxAttempts   Int?           @default(1)    
   cooldownPeriod Int?      
-  scoringPolicy String         @default("HIGHEST")
+  scoringPolicy ScoringPolicy  @default(HIGHEST)
   testQuestions TestQuestion[]
+  questionOrder Json?   
   attempts      TestAttempt[]
+  allowReview   Boolean        @default(false)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   @@index([courseId])
@@ -73,7 +92,7 @@ model TestAttempt {
   test          Test          @relation(fields: [testId], references: [id])
   testId        String
   attemptNumber Int           @default(1)
-  questionOrder String[]
+  questionOrder Json?
   optionOrders  Json?         
   answers       UserAnswer[]
   scoreDetails  ScoreDetail[]
@@ -87,15 +106,9 @@ model AnswerOption {
   id          String   @id @default(uuid())
   question    Question @relation(fields: [questionId], references: [id])
   questionId  String
-  content     String
+  content     Json
   isCorrect   Boolean
   order       Int
-}
-model CorrectAnswer {
-  id          String   @id @default(uuid())
-  question    Question @relation(fields: [questionId], references: [id])
-  questionId  String
-  answer      String
 }
 model TestQuestion {
   id          String   @id @default(uuid())
@@ -105,7 +118,6 @@ model TestQuestion {
   questionId  String
   maxScore    Float
   weight      Float    @default(1.0)
-  order       Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
