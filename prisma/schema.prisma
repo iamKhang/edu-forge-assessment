@@ -1,22 +1,151 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum QuestionType {
+  SINGLE_CHOICE
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  ESSAY
+}
+
+enum TestType {
+  PRACTICE
+  QUIZ
+  MIDTERM
+  FINAL
+  ASSIGNMENT
+}
+
+enum ScoringPolicy {
+  HIGHEST
+  AVERAGE
+  LATEST
+}
+
+model Question {
+  id              String         @id @default(uuid())
+  userId          String
+  type            QuestionType
+  content            Json
+  explanation     String?
+  courseId        String?
+  chapterId       String?
+  lessonId        String?
+  options         AnswerOption[]
+  testQuestions   TestQuestion[]
+  referenceAnswers ReferenceAnswer?
+  userAnswers     UserAnswer[]
+  scoreDetails    ScoreDetail[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([courseId])
+  @@index([chapterId])
+  @@index([lessonId])
+}
+
+model ReferenceAnswer {
+  id          String   @id @default(uuid())
+  question    Question @relation(fields: [questionId], references: [id])
+  questionId  String   @unique
+  content     Json  
+  notes       String? 
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Test {
+  id            String         @id @default(uuid())
+  title         String
+  description   String?
+  courseId      String?
+  chapterId     String?
+  lessonId      String?
+  duration      Int?
+  maxScore      Float?
+  testType      TestType       @default(PRACTICE)
+  shuffleQuestions Boolean     @default(false)
+  maxAttempts   Int?           @default(1)    
+  cooldownPeriod Int?      
+  scoringPolicy ScoringPolicy  @default(HIGHEST)
+  testQuestions TestQuestion[]
+  questionOrder Json?   
+  attempts      TestAttempt[]
+  allowReview   Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  @@index([courseId])
+  @@index([chapterId])
+  @@index([lessonId])
+  @@unique([courseId, chapterId, lessonId, title])
+}
+
+model TestAttempt {
+  id            String        @id @default(uuid())
+  userId        String
+  test          Test          @relation(fields: [testId], references: [id])
+  testId        String
+  attemptNumber Int           @default(1)
+  questionOrder Json?
+  optionOrders  Json?         
+  answers       UserAnswer[]
+  scoreDetails  ScoreDetail[]
+  totalScore    Float?
+  startedAt     DateTime
+  submittedAt   DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+model AnswerOption {
+  id          String   @id @default(uuid())
+  question    Question @relation(fields: [questionId], references: [id])
+  questionId  String
+  content     Json
+  isCorrect   Boolean
+  order       Int
+}
+model TestQuestion {
+  id          String   @id @default(uuid())
+  test        Test     @relation(fields: [testId], references: [id])
+  testId      String
+  question    Question @relation(fields: [questionId], references: [id])
+  questionId  String
+  maxScore    Float
+  weight      Float    @default(1.0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([testId, questionId])
+}
+model UserAnswer {
+  id          String      @id @default(uuid())
+  attempt     TestAttempt @relation(fields: [attemptId], references: [id])
+  attemptId   String
+  question    Question    @relation(fields: [questionId], references: [id])
+  questionId  String
+  answerData  Json
+  isGraded    Boolean     @default(false)
+  score       Float?
+  feedback    String?
+  submittedAt DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@unique([attemptId, questionId])
+}
+
+model ScoreDetail {
+  id          String      @id @default(uuid())
+  attempt     TestAttempt @relation(fields: [attemptId], references: [id])
+  attemptId   String
+  question    Question    @relation(fields: [questionId], references: [id])
+  questionId  String
+  earnedScore Float
+  feedback    String?
+  createdAt   DateTime    @default(now())
 }
