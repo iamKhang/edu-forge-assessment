@@ -30,7 +30,7 @@ enum ScoringPolicy {
 
 model Question {
   id              String         @id @default(uuid())
-  userId          String
+  questionSetterId          String
   type            QuestionType
   content            Json
   explanation     String?
@@ -62,6 +62,7 @@ model ReferenceAnswer {
 
 model Test {
   id            String         @id @default(uuid())
+  testCreator   String
   title         String
   description   String?
   courseId      String?
@@ -88,7 +89,7 @@ model Test {
 
 model TestAttempt {
   id            String        @id @default(uuid())
-  userId        String
+  testTakerId        String
   test          Test          @relation(fields: [testId], references: [id])
   testId        String
   attemptNumber Int           @default(1)
@@ -108,7 +109,6 @@ model AnswerOption {
   questionId  String
   content     Json
   isCorrect   Boolean
-  order       Int
 }
 model TestQuestion {
   id          String   @id @default(uuid())
