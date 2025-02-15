@@ -109,6 +109,7 @@ model AnswerOption {
   questionId  String
   content     Json
   isCorrect   Boolean
+  order       Int
 }
 model TestQuestion {
   id          String   @id @default(uuid())
