@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { QuestionsModule } from './questions/questions.module';
+import { TestsModule } from './tests/tests.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { QuestionsModule } from './questions/questions.module';
     }),
     PrismaModule,
     QuestionsModule,
+    TestsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
