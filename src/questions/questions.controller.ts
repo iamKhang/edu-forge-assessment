@@ -18,14 +18,12 @@ export class QuestionsController {
     @Query('courseId') courseId?: string,
     @Query('chapterId') chapterId?: string,
     @Query('lessonId') lessonId?: string,
-    @Query('type') type?: QuestionType,
   ) {
-    if (courseId || chapterId || lessonId || type) {
+    if (courseId || chapterId || lessonId) {
       return this.questionsService.findByFilters({
         courseId,
         chapterId,
         lessonId,
-        type,
       });
     }
     return this.questionsService.findAll();
