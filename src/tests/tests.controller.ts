@@ -5,7 +5,7 @@ import { UpdateTestDto } from './dto/update-test.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 
 @ApiTags('tests')
-@Controller('tests')
+@Controller('/api/v1/tests')
 export class TestsController {
   constructor(private readonly testsService: TestsService) {}
 

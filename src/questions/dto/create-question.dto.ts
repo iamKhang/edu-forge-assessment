@@ -1,6 +1,7 @@
 import { IsEnum, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { QuestionType } from '@prisma/client';
+import { QuestionDifficulty, QuestionType } from '@prisma/client';
+
 
 export class AnswerOptionDto {
   @IsString()
@@ -48,6 +49,9 @@ export class CreateQuestionDto {
   @IsOptional()
   @IsUUID()
   lessonId?: string;
+
+  @IsEnum(QuestionDifficulty)
+  difficulty: QuestionDifficulty;
 
   @IsOptional()
   @ValidateNested({ each: true })

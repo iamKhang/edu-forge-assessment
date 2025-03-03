@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { QuestionsService } from './questions.service';
-import { CreateQuestionDto } from './dto/create-question.dto';
+import { CreateQuestionDto} from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
-import { QuestionType } from '@prisma/client';
+import { QuestionDifficulty, QuestionType } from '@prisma/client';
 
-@Controller('questions')
+@Controller('/api/v1/questions')
 export class QuestionsController {
   constructor(private readonly questionsService: QuestionsService) {}
 
@@ -18,12 +18,16 @@ export class QuestionsController {
     @Query('courseId') courseId?: string,
     @Query('chapterId') chapterId?: string,
     @Query('lessonId') lessonId?: string,
+    @Query('type') type?: QuestionType,
+    @Query('difficulty') difficulty?: QuestionDifficulty,
   ) {
-    if (courseId || chapterId || lessonId) {
+    if (courseId || chapterId || lessonId || type || difficulty) {
       return this.questionsService.findByFilters({
         courseId,
         chapterId,
         lessonId,
+        type,
+        difficulty,
       });
     }
     return this.questionsService.findAll();

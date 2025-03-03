@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
-import { QuestionType } from '@prisma/client';
+import { QuestionDifficulty, QuestionType } from '@prisma/client';
 
 @Injectable()
 export class QuestionsService {
@@ -130,6 +130,7 @@ export class QuestionsService {
     chapterId?: string;
     lessonId?: string;
     type?: QuestionType;
+    difficulty?: QuestionDifficulty;
   }) {
     return this.prisma.question.findMany({
       where: filters,
