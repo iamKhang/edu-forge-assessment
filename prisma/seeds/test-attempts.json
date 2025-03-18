@@ -1,0 +1,142 @@
+{
+  "tests": [
+    {
+      "id": "test-001",
+      "testCreator": "teacher-001",
+      "title": "Midterm Math Test",
+      "description": "Basic algebra and geometry test",
+      "courseId": "course-001",
+      "duration": 3600,
+      "maxScore": 100,
+      "testType": "QUIZ",
+      "shuffleQuestions": true,
+      "maxAttempts": 2,
+      "cooldownPeriod": 86400,
+      "scoringPolicy": "HIGHEST",
+      "testStart": "2024-03-20T08:00:00Z",
+      "testEnd": "2024-03-20T10:00:00Z"
+    }
+  ],
+  "testQuestions": [
+    {
+      "id": "test-question-001",
+      "testId": "test-001",
+      "questionId": "question-001",
+      "maxScore": 10
+    },
+    {
+      "id": "test-question-002",
+      "testId": "test-001",
+      "questionId": "question-002",
+      "maxScore": 10
+    }
+  ],
+  "questions": [
+    {
+      "id": "question-001",
+      "type": "SINGLE_CHOICE",
+      "content": {
+        "text": "Solve for x: 2x + 5 = 13"
+      },
+      "explanation": "Subtract 5 from both sides, then divide by 2",
+      "difficulty": "UNDERSTANDING",
+      "options": [
+        {
+          "id": "option-001",
+          "content": { "text": "x = 4" },
+          "isCorrect": true,
+          "order": 1
+        },
+        {
+          "id": "option-002",
+          "content": { "text": "x = 6" },
+          "isCorrect": false,
+          "order": 2
+        },
+        {
+          "id": "option-003",
+          "content": { "text": "x = 3" },
+          "isCorrect": false,
+          "order": 3
+        }
+      ]
+    },
+    {
+      "id": "question-002",
+      "type": "MULTIPLE_CHOICE",
+      "content": {
+        "text": "Which of the following are properties of a square?"
+      },
+      "explanation": "A square has all these properties by definition",
+      "difficulty": "ANALYZING",
+      "options": [
+        {
+          "id": "option-004",
+          "content": { "text": "All sides are equal" },
+          "isCorrect": true,
+          "order": 1
+        },
+        {
+          "id": "option-005",
+          "content": { "text": "All angles are 90 degrees" },
+          "isCorrect": true,
+          "order": 2
+        },
+        {
+          "id": "option-006",
+          "content": { "text": "Diagonals are different lengths" },
+          "isCorrect": false,
+          "order": 3
+        }
+      ]
+    }
+  ],
+  "testAttempts": [
+    {
+      "id": "attempt-001",
+      "testId": "test-001",
+      "testTakerId": "student-001",
+      "attemptNumber": 1,
+      "questionOrder": ["question-001", "question-002"],
+      "optionOrders": {
+        "question-001": ["option-002", "option-001", "option-003"],
+        "question-002": ["option-005", "option-004", "option-006"]
+      },
+      "startedAt": "2024-03-20T08:30:00Z"
+    }
+  ],
+  "userAnswers": [
+    {
+      "id": "answer-001",
+      "attemptId": "attempt-001",
+      "questionId": "question-001",
+      "answerData": "option-001",
+      "isGraded": true,
+      "score": 10
+    },
+    {
+      "id": "answer-002",
+      "attemptId": "attempt-001",
+      "questionId": "question-002",
+      "answerData": ["option-004", "option-005"],
+      "isGraded": true,
+      "score": 10
+    }
+  ],
+  "scoreDetails": [
+    {
+      "id": "score-001",
+      "attemptId": "attempt-001",
+      "questionId": "question-001",
+      "earnedScore": 10,
+      "feedback": "Correct answer"
+    },
+    {
+      "id": "score-002",
+      "attemptId": "attempt-001",
+      "questionId": "question-002",
+      "earnedScore": 10,
+      "feedback": "Correct answer"
+    }
+  ]
+} 

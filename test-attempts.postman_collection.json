@@ -1,0 +1,186 @@
+{
+  "info": {
+    "name": "Test Attempts API",
+    "description": "Collection for testing the Test Attempts API endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Create Test Attempt",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/test-attempts",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "test-attempts"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": {
+            "testId": "test-001",
+            "testTakerId": "student-001"
+          }
+        },
+        "description": "Creates a new test attempt for a student"
+      },
+      "response": []
+    },
+    {
+      "name": "2a. Submit Answer - Question 1",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/test-attempts/{{attemptId}}/answers",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "test-attempts", "{{attemptId}}", "answers"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": {
+            "questionId": "question-001",
+            "answerData": "option-001"
+          }
+        },
+        "description": "Submits answer for the first question (single choice)"
+      },
+      "response": []
+    },
+    {
+      "name": "2b. Submit Answer - Question 2",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/test-attempts/{{attemptId}}/answers",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "test-attempts", "{{attemptId}}", "answers"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": {
+            "questionId": "question-002",
+            "answerData": ["option-004", "option-005"]
+          }
+        },
+        "description": "Submits answer for the second question (multiple choice)"
+      },
+      "response": []
+    },
+    {
+      "name": "3. Get Attempt Status",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/test-attempts/{{attemptId}}/status",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "test-attempts", "{{attemptId}}", "status"]
+        },
+        "description": "Gets the current status of the test attempt"
+      },
+      "response": []
+    },
+    {
+      "name": "4. Submit Test Attempt",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/test-attempts/{{attemptId}}/submit",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "test-attempts", "{{attemptId}}", "submit"]
+        },
+        "description": "Submits the entire test attempt for grading"
+      },
+      "response": []
+    },
+    {
+      "name": "5a. List All Test Attempts",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/test-attempts",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "test-attempts"],
+          "query": [
+            {
+              "key": "skip",
+              "value": "0"
+            },
+            {
+              "key": "take",
+              "value": "10"
+            }
+          ]
+        },
+        "description": "Gets all test attempts with pagination"
+      },
+      "response": []
+    },
+    {
+      "name": "5b. List Test Attempts by Test",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/test-attempts?testId=test-001",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "test-attempts"],
+          "query": [
+            {
+              "key": "testId",
+              "value": "test-001"
+            }
+          ]
+        },
+        "description": "Gets all test attempts for a specific test"
+      },
+      "response": []
+    },
+    {
+      "name": "5c. List Test Attempts by Student",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/test-attempts?testTakerId=student-001",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "test-attempts"],
+          "query": [
+            {
+              "key": "testTakerId",
+              "value": "student-001"
+            }
+          ]
+        },
+        "description": "Gets all test attempts for a specific student"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "attemptId",
+      "value": "attempt-001",
+      "type": "string"
+    }
+  ]
+} 
