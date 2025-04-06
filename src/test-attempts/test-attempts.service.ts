@@ -26,6 +26,90 @@ export class TestAttemptsService {
       },
     });
   }
+
+  async getTestResult(attemptId: string) {
+    const attempt = await this.prisma.testAttempt.findUnique({
+      where: { id: attemptId },
+      include: {
+        test: {
+          include: {
+            testQuestions: {
+              include: {
+                question: {
+                  include: {
+                    options: true,
+                    referenceAnswers: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        answers: true,
+        scoreDetails: true,
+      },
+    });
+
+    if (!attempt) {
+      throw new NotFoundException('Test attempt not found');
+    }
+
+    if (!attempt.submittedAt) {
+      throw new BadRequestException('Test attempt not submitted yet');
+    }
+
+    // Check if review is allowed
+    const canReview = attempt.test.allowReview;
+
+    // Basic result information
+    const result = {
+      id: attempt.id,
+      testId: attempt.testId,
+      testTitle: attempt.test.title,
+      testType: attempt.test.testType,
+      attemptNumber: attempt.attemptNumber,
+      totalScore: attempt.totalScore,
+      maxScore: attempt.test.maxScore,
+      startedAt: attempt.startedAt,
+      submittedAt: attempt.submittedAt,
+      canReview,
+      questions: [],
+    };
+
+    // If review is not allowed, return basic information only
+    if (!canReview) {
+      return result;
+    }
+
+    // If review is allowed, include detailed question information
+    const questionOrder = attempt.questionOrder as string[];
+    const questions = [];
+
+    for (const questionId of questionOrder) {
+      const testQuestion = attempt.test.testQuestions.find(
+        (tq) => tq.questionId === questionId
+      );
+
+      if (!testQuestion) continue;
+
+      const answer = attempt.answers.find((a) => a.questionId === questionId);
+      const scoreDetail = attempt.scoreDetails.find((s) => s.questionId === questionId);
+
+      questions.push({
+        id: questionId,
+        question: testQuestion.question,
+        maxScore: testQuestion.maxScore,
+        earnedScore: scoreDetail?.earnedScore || 0,
+        feedback: scoreDetail?.feedback || '',
+        userAnswer: answer?.answerData || null,
+        optionOrder: attempt.optionOrders?.[questionId] || [],
+        referenceAnswer: testQuestion.question.referenceAnswers,
+      });
+    }
+
+    result.questions = questions;
+    return result;
+  }
   async create(createTestAttemptDto: CreateTestAttemptDto) {
     // Get the test details
     const test = await this.prisma.test.findUnique({

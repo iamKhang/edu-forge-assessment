@@ -52,4 +52,9 @@ export class TestAttemptsController {
   getStatus(@Param('id') id: string) {
     return this.testAttemptsService.getAttemptStatus(id);
   }
-} 
+
+  @Get(':id/result')
+  getResult(@Param('id') id: string) {
+    return this.testAttemptsService.getTestResult(id);
+  }
+}
