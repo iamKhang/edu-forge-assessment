@@ -5,31 +5,31 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: edu-forge-course-service
+    container_name: edu-force-assessment-api
     ports:
       - '3005:3005'
     depends_on:
-      postgres:
+      postgres-assessment:
         condition: service_healthy
     env_file:
       - .env
     environment:
-      - DATABASE_URL=${DATABASE_URL_DOCKER}
+      - DATABASE_URL=${DATABASE_URL}
       - PORT=3005
     restart: unless-stopped
     networks:
-      - edu-forge-network
+      - edu-force-assessment-network
     command: >
-      sh -c "until nc -z postgres 5432; do
+      sh -c "until nc -z postgres-assessment 5432; do
         echo 'Waiting for PostgreSQL to be ready...';
         sleep 2;
       done;
       echo 'PostgreSQL is ready!';
       npx prisma migrate deploy && node dist/src/main.js"
 
-  postgres:
+  postgres-assessment:
     image: postgres:17
-    container_name: edu-forge-course-db
+    container_name: postgres-assessment
     env_file:
       - .env
     environment:
@@ -37,15 +37,19 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_DB=${POSTGRES_DB}
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - postgres-data-assessment:/var/lib/postgresql/data
     restart: unless-stopped
     networks:
-      - edu-forge-network
+      - edu-force-assessment-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 10s
       retries: 5
+
 networks:
-  edu-forge-network:
+  edu-force-assessment-network:
     driver: bridge
+
+volumes:
+  postgres-data-assessment:

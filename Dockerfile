@@ -25,7 +25,7 @@ WORKDIR /app
 
 # Copy package files and install only production dependencies
 COPY package*.json ./
-RUN npm install --only=production --ignore-scripts
+RUN npm install
 
 # Copy Prisma schema and generate client
 COPY prisma ./prisma/
