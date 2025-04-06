@@ -64,6 +64,7 @@ model Test {
   allowReview      Boolean        @default(false) @map("allow_review")
   testStart        DateTime       @default(now()) @map("test_start")
   testEnd          DateTime?      @map("test_end")
+  enforceTimeLimit Boolean        @default(true) @map("enforce_time_limit")
   createdAt        DateTime       @default(now()) @map("created_at")
   updatedAt        DateTime       @updatedAt @map("updated_at")
 

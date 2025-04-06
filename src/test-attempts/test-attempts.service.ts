@@ -47,9 +47,9 @@ export class TestAttemptsService {
       throw new NotFoundException('Test not found');
     }
 
-    // Check if test has started and not ended
+    // Check if test has started and not ended (only if enforceTimeLimit is true)
     const now = new Date();
-    if (now < test.testStart || (test.testEnd && now > test.testEnd)) {
+    if (test.enforceTimeLimit && (now < test.testStart || (test.testEnd && now > test.testEnd))) {
       throw new BadRequestException('Test is not active');
     }
 
@@ -79,7 +79,7 @@ export class TestAttemptsService {
 
     if (test.shuffleQuestions) {
       questionOrder = this.shuffleArray([...questionOrder]);
-      
+
       // Shuffle options for each question
       test.testQuestions.forEach(tq => {
         if (tq.question.options.length > 0) {
@@ -133,8 +133,8 @@ export class TestAttemptsService {
       throw new NotFoundException('Test attempt not found');
     }
 
-    // Check if test has ended
-    if (attempt.test.testEnd && new Date() > attempt.test.testEnd) {
+    // Check if test has ended (only if enforceTimeLimit is true)
+    if (attempt.test.enforceTimeLimit && attempt.test.testEnd && new Date() > attempt.test.testEnd) {
       throw new BadRequestException('Test has ended');
     }
 
@@ -205,14 +205,14 @@ export class TestAttemptsService {
 
         if (answer) {
           // For multiple choice questions
-          if (testQuestion.question.type === 'SINGLE_CHOICE' || 
+          if (testQuestion.question.type === 'SINGLE_CHOICE' ||
               testQuestion.question.type === 'MULTIPLE_CHOICE') {
             const correctOptions = testQuestion.question.options
               .filter((opt) => opt.isCorrect)
               .map((opt) => opt.id);
-            
-            const userOptions = Array.isArray(answer.answerData) 
-              ? answer.answerData 
+
+            const userOptions = Array.isArray(answer.answerData)
+              ? answer.answerData
               : [answer.answerData];
 
             const isCorrect = correctOptions.length === userOptions.length &&
@@ -225,6 +225,43 @@ export class TestAttemptsService {
           else if (testQuestion.question.type === 'ESSAY') {
             earnedScore = 0;
             feedback = 'Pending review';
+          }
+          else if (testQuestion.question.type === 'TRUE_FALSE') {
+            // Lấy tất cả các mệnh đề (options) của câu hỏi
+            const options = testQuestion.question.options;
+
+            // Lấy câu trả lời của học sinh
+            const userAnswers = answer.answerData || {};
+
+            // Số mệnh đề đúng
+            let correctCount = 0;
+
+            // Kiểm tra từng mệnh đề
+            options.forEach(option => {
+              // Lựa chọn của học sinh cho mệnh đề này (true/false)
+              const userChoice = userAnswers[option.id];
+
+              // Đáp án đúng của mệnh đề (true nếu isCorrect=true, false nếu isCorrect=false)
+              const correctAnswer = option.isCorrect;
+
+              // Nếu học sinh chọn đúng
+              if (userChoice === correctAnswer) {
+                correctCount++;
+              }
+            });
+
+            // Tính điểm dựa trên tỷ lệ mệnh đề đúng
+            const scorePerOption = testQuestion.maxScore / options.length;
+            earnedScore = correctCount * scorePerOption;
+
+            // Phản hồi
+            if (correctCount === options.length) {
+              feedback = 'All statements answered correctly';
+            } else if (correctCount === 0) {
+              feedback = 'All statements answered incorrectly';
+            } else {
+              feedback = `${correctCount} out of ${options.length} statements answered correctly`;
+            }
           }
         }
 
@@ -274,7 +311,7 @@ export class TestAttemptsService {
     }
 
     const now = new Date();
-    const timeRemaining = attempt.test.testEnd 
+    const timeRemaining = (attempt.test.enforceTimeLimit && attempt.test.testEnd)
       ? Math.max(0, attempt.test.testEnd.getTime() - now.getTime())
       : null;
 
@@ -301,17 +338,17 @@ export class TestAttemptsService {
     take?: number;
   }) {
     const { testId, testTakerId, isSubmitted, skip = 0, take = 10 } = params;
-    
+
     const where: Prisma.TestAttemptWhereInput = {};
-    
+
     if (testId) {
       where.testId = testId;
     }
-    
+
     if (testTakerId) {
       where.testTakerId = testTakerId;
     }
-    
+
     if (isSubmitted !== undefined) {
       where.submittedAt = isSubmitted ? { not: null } : null;
     }
@@ -357,4 +394,4 @@ export class TestAttemptsService {
       }
     };
   }
-} 
+}

@@ -14,7 +14,8 @@
       "cooldownPeriod": 86400,
       "scoringPolicy": "HIGHEST",
       "testStart": "2024-03-20T08:00:00Z",
-      "testEnd": "2024-03-20T10:00:00Z"
+      "testEnd": "2024-03-20T10:00:00Z",
+      "enforceTimeLimit": true
     }
   ],
   "testQuestions": [
@@ -139,4 +140,4 @@
       "feedback": "Correct answer"
     }
   ]
-} 
+}

@@ -97,4 +97,8 @@ export class CreateTestDto {
   @Type(() => Date)
   @ApiProperty({ required: false })
   testEnd?: Date;
-} 
+
+  @IsBoolean()
+  @ApiProperty({ default: true, description: 'Whether to enforce time limits for this test' })
+  enforceTimeLimit: boolean = true;
+}
