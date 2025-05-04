@@ -101,4 +101,8 @@ export class CreateTestDto {
   @IsBoolean()
   @ApiProperty({ default: true, description: 'Whether to enforce time limits for this test' })
   enforceTimeLimit: boolean = true;
+
+  @IsBoolean()
+  @ApiProperty({ default: false, description: 'Whether to allow unlimited attempts for this test' })
+  unlimitedAttempts: boolean = false;
 }
