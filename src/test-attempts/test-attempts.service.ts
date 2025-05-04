@@ -54,7 +54,7 @@ export class TestAttemptsService {
     }
 
     // Check attempt limits (skip if unlimitedAttempts is true)
-    if (test.maxAttempts && !test.unlimitedAttempts) {
+    if (test.maxAttempts && !(test as any).unlimitedAttempts) {
       const attemptCount = await this.prisma.testAttempt.count({
         where: {
           testId: test.id,
