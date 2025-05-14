@@ -29,7 +29,7 @@ services:
         sleep 2;
       done;
       echo 'PostgreSQL is ready!';
-      npx prisma migrate deploy && node dist/src/main.js"
+      npx prisma migrate deploy && node dist/main.js"
 
   postgres-assessment:
     image: postgres:17

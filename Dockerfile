@@ -25,4 +25,4 @@ RUN npm run build
 EXPOSE 3005
 
 # Khởi chạy ứng dụng
-CMD ["node", "dist/src/main.js"]
+CMD ["node", "dist/main.js"]
