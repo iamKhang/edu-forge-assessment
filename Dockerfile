@@ -12,8 +12,11 @@ RUN npm install
 # Sao chép toàn bộ source code
 COPY . .
 
-# Tạo Prisma client
+# Tạo Prisma client (không chạy seed)
 RUN npx prisma generate
+
+# Bỏ qua việc biên dịch file seed.ts
+RUN rm -f prisma/seed.ts
 
 # Build ứng dụng
 RUN npm run build
