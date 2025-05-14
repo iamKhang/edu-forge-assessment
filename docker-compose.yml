@@ -16,12 +16,12 @@ services:
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - PORT=3005
-      - NODE_OPTIONS=--max_old_space_size=512
+      - NODE_OPTIONS=--max_old_space_size=1024
     restart: unless-stopped
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 1.5G
     networks:
       - edu-force-assessment-network
     command: >

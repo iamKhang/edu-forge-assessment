@@ -3,17 +3,20 @@ FROM node:20-alpine AS build-stage
 
 WORKDIR /app
 
+# Install build dependencies
+RUN apk add --no-cache python3 make g++
+
 # Copy package files and install all dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
-# Copy Prisma schema and generate client with minimal memory usage
+# Copy Prisma schema and generate client with optimized memory usage
 COPY prisma ./prisma/
-RUN NODE_OPTIONS="--max_old_space_size=512" npx prisma generate
+RUN NODE_OPTIONS="--max_old_space_size=1024" npx prisma generate
 
-# Copy source code and build application
+# Copy source code and build application with increased memory
 COPY . .
-RUN npm run build
+RUN NODE_OPTIONS="--max_old_space_size=1024" npm run build
 
 # Production stage
 FROM node:20-alpine AS production
