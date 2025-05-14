@@ -32,10 +32,6 @@ export class CreateQuestionDto {
 
   @IsOptional()
   @IsString()
-  explanation?: string;
-
-  @IsOptional()
-  @IsString()
   questionSetterId?: string;
 
   @IsOptional()

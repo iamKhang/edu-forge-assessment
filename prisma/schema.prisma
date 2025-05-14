@@ -13,7 +13,6 @@ model Question {
   questionSetterId String?            @map("question_setter_id")
   type             QuestionType       @default(SINGLE_CHOICE) @map("question_type")
   content          Json
-  explanation      String?
   courseId         String?            @map("course_id")
   chapterId        String?            @map("chapter_id")
   lessonId         String?            @map("lesson_id")

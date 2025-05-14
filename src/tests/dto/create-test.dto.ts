@@ -104,5 +104,5 @@ export class CreateTestDto {
 
   @IsBoolean()
   @ApiProperty({ default: false, description: 'Whether to allow unlimited attempts for this test' })
-  unlimitedAttempts: boolean = false;
+  unlimitedAttempts: boolean = true;
 }
