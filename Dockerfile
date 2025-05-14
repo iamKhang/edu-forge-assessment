@@ -18,14 +18,18 @@ RUN npm run build
 # Production stage
 FROM node:20-alpine AS production
 
-# Install necessary packages
-RUN apk add --no-cache postgresql-client
+# Install necessary packages including npm
+RUN apk update && \
+    apk add --no-cache \
+    postgresql-client
 
 WORKDIR /app
 
 # Copy package files and install only production dependencies
 COPY package*.json ./
-RUN npm install --only=production
+# Skip husky install and only install production dependencies
+RUN npm pkg delete scripts.prepare && \
+    npm ci --omit=dev --ignore-scripts
 
 # Copy Prisma schema and essential files only
 COPY prisma ./prisma/

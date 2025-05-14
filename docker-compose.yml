@@ -34,6 +34,7 @@ services:
 
   postgres-assessment:
     image: postgres:17
+    pull_policy: always
     container_name: postgres-assessment
     env_file:
       - .env
