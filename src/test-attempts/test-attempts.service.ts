@@ -53,8 +53,8 @@ export class TestAttemptsService {
       throw new BadRequestException('Test is not active');
     }
 
-    // Check attempt limits
-    if (test.maxAttempts) {
+    // Check attempt limits (skip if unlimitedAttempts is true)
+    if (test.maxAttempts && !(test as any).unlimitedAttempts) {
       const attemptCount = await this.prisma.testAttempt.count({
         where: {
           testId: test.id,
