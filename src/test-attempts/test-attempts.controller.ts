@@ -1,11 +1,29 @@
-import { Controller, Post, Body, Param, Get, HttpCode, Query } from '@nestjs/common';
+import { Controller, Post, Body, Param, Get, HttpCode, Query, ParseUUIDPipe } from '@nestjs/common';
 import { TestAttemptsService } from './test-attempts.service';
 import { CreateTestAttemptDto } from './dto/create-test-attempt.dto';
 import { SubmitAnswerDto } from './dto/submit-answer.dto';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 
+@ApiTags('test-attempts')
 @Controller('api/v1/test-attempts')
 export class TestAttemptsController {
   constructor(private readonly testAttemptsService: TestAttemptsService) {}
+
+  @Get('highest-score')
+  @ApiOperation({ summary: 'Get the highest score attempt for a specific test and test taker' })
+  @ApiQuery({ name: 'testId', required: true })
+  @ApiQuery({ name: 'testTakerId', required: true })
+  @ApiResponse({ status: 200, description: 'Returns the highest score attempt' })
+  @ApiResponse({ status: 404, description: 'No attempts found' })
+  async getHighestScoreAttempt(
+    @Query('testId', ParseUUIDPipe) testId: string,
+    @Query('testTakerId') testTakerId: string,
+  ) {
+    console.log('Getting highest score attempt with params:', { testId, testTakerId });
+    const result = await this.testAttemptsService.getHighestScoreAttempt(testId, testTakerId);
+    console.log('Result:', result);
+    return result;
+  }
 
   @Get()
   findAll(

@@ -394,4 +394,72 @@ export class TestAttemptsService {
       }
     };
   }
+
+  async getHighestScoreAttempt(testId: string, testTakerId: string) {
+    console.log('Searching for highest score attempt with params:', { testId, testTakerId });
+
+    // First, check if there are any attempts at all for this combination
+    const attempts = await this.prisma.testAttempt.findMany({
+      where: {
+        testId,
+        testTakerId,
+      },
+      orderBy: {
+        totalScore: 'desc',
+      },
+      include: {
+        test: {
+          select: {
+            title: true,
+            testType: true,
+            maxScore: true,
+            testStart: true,
+            testEnd: true,
+          }
+        },
+        answers: {
+          select: {
+            questionId: true,
+            answerData: true,
+            score: true,
+          }
+        },
+        scoreDetails: true,
+      },
+    });
+
+    console.log('Found attempts:', attempts.map(a => ({
+      id: a.id,
+      totalScore: a.totalScore,
+      submittedAt: a.submittedAt,
+    })));
+
+    if (attempts.length === 0) {
+      throw new NotFoundException(`No attempts found for test ${testId} and test taker ${testTakerId}`);
+    }
+
+    // Get the attempt with highest score that has been submitted
+    const submittedAttempts = attempts.filter(a => a.submittedAt !== null);
+    console.log('Submitted attempts:', submittedAttempts.map(a => ({
+      id: a.id,
+      totalScore: a.totalScore,
+      submittedAt: a.submittedAt,
+    })));
+
+    if (submittedAttempts.length === 0) {
+      throw new NotFoundException('No submitted attempts found for this test and test taker');
+    }
+
+    // Sort by totalScore in descending order
+    submittedAttempts.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
+    const highestScoreAttempt = submittedAttempts[0];
+
+    console.log('Highest score attempt:', {
+      id: highestScoreAttempt.id,
+      totalScore: highestScoreAttempt.totalScore,
+      submittedAt: highestScoreAttempt.submittedAt,
+    });
+
+    return highestScoreAttempt;
+  }
 }
